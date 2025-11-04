@@ -15,6 +15,8 @@ namespace MyBird
         #region Unity Event Method
         private void Update()
         {
+            if (GameManager.IsGameOver == true)
+                return;
             RollingMove();
         }
         #endregion

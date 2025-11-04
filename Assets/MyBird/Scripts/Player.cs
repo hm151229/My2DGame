@@ -30,7 +30,12 @@ namespace MyBird
         //이동
         [SerializeField]
         private float moveSpeed = 5f;                   //이동속도
+
+        //버드 UI
+        public GameObject readyUI;
+        public GameObject gameOverUI;
         #endregion
+
         #region Unity Event Method 
         private void Start()
         {
@@ -68,12 +73,44 @@ namespace MyBird
                 keyJump = false;
             }
         }
+        //충돌체크 - 매개변수로 부딫힌 충돌체를 입력받는다
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            //충돌한 충돌체 체크
+            if (collision.gameObject.tag == "Pipe")
+            {
+                GameOver();
+            }
+            else if (collision.gameObject.tag == "Ground")
+            {
+                GameOver();
+            }
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            //충돌한 충돌체 체크
+            if(collision.gameObject.tag == "Point")
+            {
+                GameManager.Score++;
+                //Debug.Log("점수 획득");
+            }
+        }
         #endregion
 
         #region Cudtom Method
+        //게임 오버 처리
+        void GameOver()
+        {
+            GameManager.IsGameOver = true;
+            gameOverUI.SetActive(true);
+        }
         //입력 처리
         void InputBird()
         {
+            if (GameManager.IsGameOver)
+                return;
+
             //스페이스 키 OR 마우스 왼클릭 입력받기
             keyJump |= Input.GetKeyUp(KeyCode.Space);
             keyJump |= Input.GetMouseButtonDown(0);
@@ -82,6 +119,8 @@ namespace MyBird
             if(GameManager.IsStart == false && keyJump == true)
             {
                 GameManager.IsStart = true;
+                //UI
+                readyUI.SetActive(false);
             }
         }
         //버드 대기
@@ -125,6 +164,8 @@ namespace MyBird
         //버드 이동
         void MoveBird()
         {
+            if (GameManager.IsGameOver)
+                return;
             transform.Translate(Vector3.right * Time.deltaTime * moveSpeed, Space.World );
         }
         #endregion
