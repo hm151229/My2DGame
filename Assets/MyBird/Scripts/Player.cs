@@ -34,12 +34,16 @@ namespace MyBird
         //버드 UI
         public GameObject readyUI;
         public GameObject gameOverUI;
+
+        //사운드
+        private AudioSource audioSource;                //포인트 사운드
         #endregion
 
         #region Unity Event Method 
         private void Start()
         {
             rb2D = this.GetComponent<Rigidbody2D>();
+            audioSource = this.GetComponent<AudioSource>();
         }
         private void Update()
         {
@@ -77,11 +81,7 @@ namespace MyBird
         private void OnCollisionEnter2D(Collision2D collision)
         {
             //충돌한 충돌체 체크
-            if (collision.gameObject.tag == "Pipe")
-            {
-                GameOver();
-            }
-            else if (collision.gameObject.tag == "Ground")
+            if (collision.gameObject.tag == "Ground")
             {
                 GameOver();
             }
@@ -90,15 +90,32 @@ namespace MyBird
         private void OnTriggerEnter2D(Collider2D collision)
         {
             //충돌한 충돌체 체크
-            if(collision.gameObject.tag == "Point")
+            if (collision.gameObject.tag == "Pipe")
             {
-                GameManager.Score++;
-                //Debug.Log("점수 획득");
+                GameOver();
+            }
+            else if (collision.gameObject.tag == "Point")
+            {
+                GetPoint();
             }
         }
         #endregion
 
         #region Cudtom Method
+        //점수 획득 처리
+        void GetPoint()
+        {
+            GameManager.Score++;
+            audioSource.Play();
+
+            //게임 포인트 체크 - 기둥을 10개 통과할때마다
+            if (GameManager.Score%10 == 0)
+            {
+                //레벨링
+                GameManager.spawnValue += 0.05f;
+            }
+
+        }
         //게임 오버 처리
         void GameOver()
         {
@@ -110,11 +127,22 @@ namespace MyBird
         {
             if (GameManager.IsGameOver)
                 return;
+#if UNITY_EDITOR    //유니티 에디터 마우스와 키보드 입력 처리
 
             //스페이스 키 OR 마우스 왼클릭 입력받기
             keyJump |= Input.GetKeyUp(KeyCode.Space);
             keyJump |= Input.GetMouseButtonDown(0);
-
+#else   //그 외 플랫폼에서 터치 입력 처리
+            if(Input.touchCount > 0)
+            {
+                //첫번째 들어온 터치 가져오기 
+                Touch touch = Input.GetTouch(0);
+                if(touch.phase == TouchPhase.Began)
+                {
+                    keyJump |= true;
+                }
+            }
+#endif
             //플레이어 이동 시작
             if(GameManager.IsStart == false && keyJump == true)
             {
@@ -168,6 +196,6 @@ namespace MyBird
                 return;
             transform.Translate(Vector3.right * Time.deltaTime * moveSpeed, Space.World );
         }
-        #endregion
+#endregion
     }
 }
