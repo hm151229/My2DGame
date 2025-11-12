@@ -17,6 +17,7 @@ namespace My2DGame
         private Rigidbody2D rb2D;
         private Animator animator;
         private TouchingDirections touchingDirections;
+        private Damageable damageable;
 
         //입력값
         private Vector2 inputMove = Vector2.zero;
@@ -115,6 +116,14 @@ namespace My2DGame
                 return animator.GetBool(AnimationString.CannotMove);
             }
         }
+
+        public bool LockVelocity
+        {
+            get
+            {
+                return animator.GetBool(AnimationString.LockVelocity);
+            }
+        }
         #endregion
 
         #region Unity Event Method
@@ -123,13 +132,19 @@ namespace My2DGame
             //참조
             rb2D = GetComponent<Rigidbody2D>();
             animator = GetComponent<Animator>();
-            touchingDirections = GetComponent<TouchingDirections>();        
+            touchingDirections = GetComponent<TouchingDirections>(); 
+            damageable = GetComponent<Damageable>();
+
+            //이벤트 함수 등록
+            damageable.hitAction += OnHit;
         }
         private void FixedUpdate()
         {
-            // 물리 이동
-            rb2D.linearVelocity = new Vector2(inputMove.x * CurrentMoveSpeed, rb2D.linearVelocity.y);
-
+            if (LockVelocity == false)
+            {
+                // 좌우 이동
+                rb2D.linearVelocity = new Vector2(inputMove.x * CurrentMoveSpeed, rb2D.linearVelocity.y);
+            }
             //점프 애니메이션
             animator.SetFloat(AnimationString.YVelocity, rb2D.linearVelocity.y);
         }
@@ -139,6 +154,9 @@ namespace My2DGame
         //방향 전환 
         void SetFacingDirection(Vector2 moveInput)
         {
+            if(CannotMove)
+                return;
+
             if(moveInput.x > 0f && IsFacingRight == false)  //오른쪽으로 이동 
             {
                 IsFacingRight = true;
@@ -148,6 +166,7 @@ namespace My2DGame
                 IsFacingRight = false;
             }
         }
+        //이동 입력 처리
         public void OnMove(InputAction.CallbackContext context)
         {
             inputMove = context.ReadValue<Vector2>();
@@ -172,7 +191,7 @@ namespace My2DGame
         //점프 입력 처리
         public void OnJump(InputAction.CallbackContext context)
         {
-            if (context.started && touchingDirections.IsGround)
+            if (context.started && touchingDirections.IsGround && CannotMove == false)
             {
                 animator.SetTrigger(AnimationString.JumpTrigger);
 
@@ -186,6 +205,12 @@ namespace My2DGame
             {
                 animator.SetTrigger(AnimationString.AttackTrigger);
             }
+        }
+
+        //데미지 이벤트에 등록되는 함수
+        public void OnHit(float damage, Vector2 knockback)
+        {
+            rb2D.linearVelocity = new Vector2 (knockback.x, rb2D.linearVelocity.y + knockback.y);
         }
         #endregion
     }
