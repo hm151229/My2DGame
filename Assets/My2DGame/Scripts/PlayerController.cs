@@ -207,6 +207,15 @@ namespace My2DGame
             }
         }
 
+        public void OnBowAttack(InputAction.CallbackContext context)
+        {
+            Debug.Log("활");
+            if (context.started && touchingDirections.IsGround)
+            {
+                animator.SetTrigger(AnimationString.BowAttackTrigger);
+            }
+        }
+
         //데미지 이벤트에 등록되는 함수
         public void OnHit(float damage, Vector2 knockback)
         {
