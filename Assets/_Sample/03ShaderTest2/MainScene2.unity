@@ -6346,8 +6346,9 @@ GameObject:
   - component: {fileID: 1553960694}
   - component: {fileID: 1553960695}
   - component: {fileID: 1553960696}
+  - component: {fileID: 1553960697}
   m_Layer: 6
-  m_Name: Player
+  m_Name: TestPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6440,7 +6441,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6683,7 +6684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentHealth: 0
-  maxHealth: 50
+  maxHealth: 20
   invincibleTimer: 3
   invincibleMaterial: {fileID: 2100000, guid: 28114510f409a27488df11c239b946ce, type: 2}
 --- !u!114 &1553960696
@@ -6700,6 +6701,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectilePrefab: {fileID: 4131708869259538543, guid: 7601677d574072e4390e8b4873c894b8, type: 3}
   firePoint: {fileID: 457923052}
+--- !u!114 &1553960697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1553960686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c7a1b8860113347a7c75dd5c58aed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ghostMaterial: {fileID: 2100000, guid: de3ea47c6ad85e64996dd4e3d9a429e2, type: 2}
+  trailActiveTime: 2
+  trailRefreshRate: 0.1
+  trailDestroyDelay: 1
+  shaderValueRate: 0.1
+  shaderValueRefeshRate: 0.1
 --- !u!1 &1817555483
 GameObject:
   m_ObjectHideFlags: 0
@@ -11582,7 +11601,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6427971931714112352, guid: c71682bf116a17a45b8396e56d558fa4, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

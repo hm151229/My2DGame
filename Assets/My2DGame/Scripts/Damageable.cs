@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 namespace My2DGame
 {
@@ -11,6 +12,7 @@ namespace My2DGame
         #region Variables
         //참조
         private Animator animator;
+        private Renderer renderer;
 
         [SerializeField]
         private float currentHealth;
@@ -25,6 +27,9 @@ namespace My2DGame
         [SerializeField]
         private float invincibleTimer = 3f;
         private float countdown = 0f;
+        //무적 모드 효과
+        public Material invincibleMaterial; //무적모드 메터리얼
+        private Material oringinMaterial;   //오리지널 메터리얼
 
         //데미지 입을 때 호출되는 이벤트 함수
         public UnityAction<float, Vector2> hitAction;
@@ -72,24 +77,29 @@ namespace My2DGame
         {
             //참조
             animator = GetComponent<Animator>();
+            renderer = GetComponent<Renderer>();
         }
 
         private void Start()
         {
             //초기화
             CurrentHealth = MaxHealth;
+            oringinMaterial = renderer.material;
         }
         private void Update()
         {
+            //죽음 체크
+            if (IsDeath)
+                return;
             //무적 타이머 - 무적 모드일 때
             if (isInvincible)
             {
                 countdown += Time.deltaTime;
                 if (countdown >= invincibleTimer)
                 {
-                    //타이머 기능
-
+                    //타이머 구현 - 무적 모드 해제
                     isInvincible = false ;
+                    renderer.material = oringinMaterial;
 
                     //타이머 초기화
                     countdown = 0f;
@@ -109,6 +119,8 @@ namespace My2DGame
             Debug.Log(CurrentHealth);
 
             isInvincible = true;
+            //무적 모드 효과
+            renderer.material = invincibleMaterial != null ? invincibleMaterial : oringinMaterial;
 
             //애니메이션
             animator.SetTrigger(AnimationString.HitTrigger);

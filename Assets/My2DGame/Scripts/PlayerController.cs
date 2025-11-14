@@ -18,6 +18,8 @@ namespace My2DGame
         private Animator animator;
         private TouchingDirections touchingDirections;
         private Damageable damageable;
+        //잔상 효과
+        private TrailEffect trailEffect;
 
         //입력값
         private Vector2 inputMove = Vector2.zero;
@@ -134,6 +136,7 @@ namespace My2DGame
             animator = GetComponent<Animator>();
             touchingDirections = GetComponent<TouchingDirections>(); 
             damageable = GetComponent<Damageable>();
+            trailEffect = GetComponent<TrailEffect>();
 
             //이벤트 함수 등록
             damageable.hitAction += OnHit;
@@ -154,9 +157,6 @@ namespace My2DGame
         //방향 전환 
         void SetFacingDirection(Vector2 moveInput)
         {
-            if(CannotMove)
-                return;
-
             if(moveInput.x > 0f && IsFacingRight == false)  //오른쪽으로 이동 
             {
                 IsFacingRight = true;
@@ -170,9 +170,12 @@ namespace My2DGame
         public void OnMove(InputAction.CallbackContext context)
         {
             inputMove = context.ReadValue<Vector2>();
-            IsMove = inputMove != Vector2.zero;
-            //방향 전환
-            SetFacingDirection(inputMove);
+            if (damageable.IsDeath == false)
+            {
+                IsMove = inputMove != Vector2.zero;
+                //방향 전환
+                SetFacingDirection(inputMove);
+            }
         }
 
         public void OnRun(InputAction.CallbackContext context)
@@ -180,6 +183,12 @@ namespace My2DGame
             if (context.started)    //버튼을 눌렀을 때 
             {
                 IsRun = true;
+
+                //잔상 효과
+                if (trailEffect != null)
+                {
+                    trailEffect.StartTrailEffect();
+                }
             }
             else if (context.canceled)  //버튼을 땔 때
             {
@@ -196,6 +205,12 @@ namespace My2DGame
                 animator.SetTrigger(AnimationString.JumpTrigger);
 
                 rb2D.linearVelocity = new Vector2(rb2D.linearVelocity.x, jumpForce);
+
+                //잔상 효과
+                if (trailEffect != null)
+                {
+                    trailEffect.StartTrailEffect();
+                }
             }
         }
         //공격 입력 처리
@@ -209,7 +224,7 @@ namespace My2DGame
 
         public void OnBowAttack(InputAction.CallbackContext context)
         {
-            Debug.Log("활");
+            //Debug.Log("활");
             if (context.started && touchingDirections.IsGround)
             {
                 animator.SetTrigger(AnimationString.BowAttackTrigger);
